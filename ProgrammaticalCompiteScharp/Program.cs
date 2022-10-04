@@ -10,7 +10,7 @@ namespace ProgrammaticalCompiteScharp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Считаю комбинации и коэффициенты...");
+            Console.WriteLine(">> Считаю комбинации и коэффициенты...\n");
 
             int[] period = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
             Combinations<int> combinationsList = new Combinations<int>(period, 10);            
@@ -35,7 +35,7 @@ namespace ProgrammaticalCompiteScharp
                 k++;
             }
 
-            Console.WriteLine("Решаю системы уравнений...");
+            Console.WriteLine("\n>> Решаю системы уравнений...\n");
 
             List<Vector<double>> SolutionCompute = new List<Vector<double>>();
             for (int i = 0; i < coefficients.Count; i++)
@@ -52,7 +52,7 @@ namespace ProgrammaticalCompiteScharp
                 }
                 if (i == 0)
                 {
-                    Console.WriteLine("Один из массивов коэффициентов:");
+                    Console.WriteLine("\n>> Один из массивов коэффициентов:\n");
                     for (int j = 0; j < coefficientsArray.GetLength(0); j++)
                     {
                         for (int ii = 0; ii < coefficientsArray.GetLength(1); ii++)
@@ -61,34 +61,78 @@ namespace ProgrammaticalCompiteScharp
                         }
                         Console.WriteLine();
                     }                    
-                    Console.WriteLine("\nОдин из массивов f(x):");
+                    Console.WriteLine("\n>> Один из массивов f(x):\n");
                     for (int j = 0; j < resultFunctionArray.Length; j++)
                     {
                         Console.Write(resultFunctionArray[j] + "\t");
                     }
-                }
+                }                
                 Matrix<double> left = Matrix<double>.Build.DenseOfArray(coefficientsArray);
                 Vector<double> right = Vector<double>.Build.Dense(resultFunctionArray);
                 SolutionCompute.Add(left.Solve(right));
             }
 
-            Console.WriteLine("Нахожу средние значения аппроксимации...");            
+            Console.WriteLine("\n>> Нахожу значения для новых функций...\n");            
             List<List<double>> ResultNewFunction = new List<List<double>>();
             for (int i = 0; i < coefficients.Count; i++)
             {
-                List<double> TempResultNewFunction = new List<double>();
+                List <double> TempResultNewFunction = new List<double>();
                 for (int j = 0; j < coefficients[i].Count; j++)
                 {
                     double value = 0;
                     for (int ii = 0; ii < coefficients[i][j].Count; ii++)
                     {
-                        value += SolutionCompute[j][ii] * Math.Pow(coefficients[i][j][ii], ii);
+                        value += SolutionCompute[j][ii] * coefficients[i][j][ii];
                     }
                     TempResultNewFunction.Add(value);
                 }
                 ResultNewFunction.Add(TempResultNewFunction);
             }
-            return;
+
+            Console.WriteLine("\n>> Нахожу средние значения ошибок аппроксимаций...\n");
+            List<double> AvgErrorApproximately = new List<double>();
+            for (int i = 0; i < ResultNewFunction.Count; i++)
+            {
+                double value = 0;
+                for (int j = 0; j < ResultNewFunction[i].Count; j++)
+                {
+                    value += Math.Abs((ResultFunction[i][j] - ResultNewFunction[i][j]) / ResultFunction[i][j]);
+                }
+                AvgErrorApproximately.Add((value/10)*100);
+            }
+
+            Console.WriteLine("\n>> Ищу наиболее точное приближение...\n");
+            double minValue = 0;
+            int minValueIndex = 0;
+
+            for (int i = 0; i < AvgErrorApproximately.Count; i++)
+            {
+                if (i == 0)
+                {
+                    minValue = AvgErrorApproximately[i];
+                    minValueIndex = i;
+                }
+                else if (minValue > AvgErrorApproximately[i])
+                {
+                    minValue = AvgErrorApproximately[i];
+                    minValueIndex = i;
+                }
+            }
+            Console.WriteLine($"\n>> Минимальное среднее значение аппроксимации: {minValue}\n");
+            Console.WriteLine($"\n>> При каких коэффициентах достигнуто данное значение: \n");
+            foreach (var item in coefficients[minValueIndex])
+            {
+                for (int i = 0; i < item.Count; i++)
+                {
+                    Console.Write("{0,15}", item[i]);
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine($"\n>> При каких значениях f(x) достигнуто данное значение: \n");
+            foreach (var item in ResultFunction[minValueIndex])
+            {
+                Console.Write(item + "\t");
+            }
         }
     }
 }
