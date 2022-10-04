@@ -42,7 +42,7 @@ namespace ProgrammaticalCompiteScharp
             {
                 double[,] coefficientsArray = new double[10, 10];
                 double[] resultFunctionArray = new double[10];
-                for (int j = 0; j < coefficients[j].Count; j++)
+                for (int j = 0; j < coefficients[i].Count; j++)
                 {
                     for (int ii = 0; ii < coefficients[i][j].Count; ii++)
                     {
@@ -118,21 +118,48 @@ namespace ProgrammaticalCompiteScharp
                     minValueIndex = i;
                 }
             }
+
+
+            /*****Перепроверка******/
+            Console.WriteLine($"\n>> Перепроверяем: \n");
+
+            List<Vector<double>> CheckSolutionCompute = new List<Vector<double>>();
+            for (int i = 0; i < coefficients[minValueIndex].Count; i++)
+            {
+                double[,] coefficientsArray = new double[10, 10];
+                double[] resultFunctionArray = new double[10];
+                for (int j = 0; j < coefficients[minValueIndex][i].Count; j++)
+                {
+                    coefficientsArray[i, j] = coefficients[minValueIndex][i][j];
+                    resultFunctionArray[j] = ResultFunction[minValueIndex][j];
+                }
+                Matrix<double> left = Matrix<double>.Build.DenseOfArray(coefficientsArray);
+                Vector<double> right = Vector<double>.Build.Dense(resultFunctionArray);
+                CheckSolutionCompute.Add(left.Solve(right));
+            }
+            /*****Перепроверка******/
+
+
+
+
             Console.WriteLine($"\n>> Минимальное среднее значение аппроксимации: {minValue}\n");
+            Console.WriteLine($"\n>> Результат решения системы уравнений:\n");
+            foreach (var item in SolutionCompute[minValueIndex])
+                Console.Write(item + "\t");
+
             Console.WriteLine($"\n>> При каких коэффициентах достигнуто данное значение: \n");
+
             foreach (var item in coefficients[minValueIndex])
             {
                 for (int i = 0; i < item.Count; i++)
-                {
                     Console.Write("{0,15}", item[i]);
-                }
                 Console.WriteLine();
             }
+
             Console.WriteLine($"\n>> При каких значениях f(x) достигнуто данное значение: \n");
+
             foreach (var item in ResultFunction[minValueIndex])
-            {
                 Console.Write(item + "\t");
-            }
         }
     }
 }
