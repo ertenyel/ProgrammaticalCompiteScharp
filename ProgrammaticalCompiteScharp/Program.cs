@@ -1,7 +1,6 @@
 ﻿using Combinatorics.Collections;
 using System.Collections.Generic;
 using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.LinearAlgebra.Solvers;
 using System;
 
 namespace ProgrammaticalCompiteScharp
@@ -47,8 +46,8 @@ namespace ProgrammaticalCompiteScharp
                     for (int ii = 0; ii < coefficients[i][j].Count; ii++)
                     {
                         coefficientsArray[j, ii] = coefficients[i][j][ii];
-                        resultFunctionArray[ii] = ResultFunction[j][ii];
                     }
+                    resultFunctionArray[j] = ResultFunction[i][j];
                 }
                 if (i == 0)
                 {
@@ -123,20 +122,21 @@ namespace ProgrammaticalCompiteScharp
             /*****Перепроверка******/
             Console.WriteLine($"\n>> Перепроверяем: \n");
 
-            List<Vector<double>> CheckSolutionCompute = new List<Vector<double>>();
+            Vector<double> CheckSolutionCompute;
+            double[,] coefficientsCheckArray = new double[10, 10];
+            double[] resultFunctionCheckArray = new double[10];
             for (int i = 0; i < coefficients[minValueIndex].Count; i++)
             {
-                double[,] coefficientsArray = new double[10, 10];
-                double[] resultFunctionArray = new double[10];
                 for (int j = 0; j < coefficients[minValueIndex][i].Count; j++)
                 {
-                    coefficientsArray[i, j] = coefficients[minValueIndex][i][j];
-                    resultFunctionArray[j] = ResultFunction[minValueIndex][j];
+                    coefficientsCheckArray[i, j] = coefficients[minValueIndex][i][j];
                 }
-                Matrix<double> left = Matrix<double>.Build.DenseOfArray(coefficientsArray);
-                Vector<double> right = Vector<double>.Build.Dense(resultFunctionArray);
-                CheckSolutionCompute.Add(left.Solve(right));
+                resultFunctionCheckArray[i] = ResultFunction[minValueIndex][i];
             }
+            Matrix<double> leftCheck = Matrix<double>.Build.DenseOfArray(coefficientsCheckArray);
+            Vector<double> rightCheck = Vector<double>.Build.Dense(resultFunctionCheckArray);
+            CheckSolutionCompute = leftCheck.Solve(rightCheck);
+            Console.WriteLine(CheckSolutionCompute);
             /*****Перепроверка******/
 
 
@@ -144,8 +144,7 @@ namespace ProgrammaticalCompiteScharp
 
             Console.WriteLine($"\n>> Минимальное среднее значение аппроксимации: {minValue}\n");
             Console.WriteLine($"\n>> Результат решения системы уравнений:\n");
-            foreach (var item in SolutionCompute[minValueIndex])
-                Console.Write(item + "\t");
+            Console.WriteLine(SolutionCompute[minValueIndex]);
 
             Console.WriteLine($"\n>> При каких коэффициентах достигнуто данное значение: \n");
 
@@ -160,6 +159,13 @@ namespace ProgrammaticalCompiteScharp
 
             foreach (var item in ResultFunction[minValueIndex])
                 Console.Write(item + "\t");
+
+
+            Console.WriteLine($"\n>> Решение функции от данных точек: \n");
+
+            foreach (var item in ResultNewFunction[minValueIndex])
+                Console.Write(item + "\t");
+            Console.ReadKey();
         }
     }
 }
